@@ -6,8 +6,8 @@ import v1Routes from "./routes";
 dotenv.config();
 const PORT = process.env.PORT;
 
-const app = express();
 dbConnect();
+const app = express();
 
 app.use(express.json());
 

@@ -17,9 +17,8 @@ export const dbConnect = async () => {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await mongoose.disconnect();
+  } catch (error) {
+    console.log({ error });
   }
 };
 // run().catch(console.dir);

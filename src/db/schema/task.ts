@@ -17,7 +17,10 @@ const TaskSchema = new Schema(
     status: {
       type: String,
       required: [true, "Status is required"],
-      enum: ["pending", "in-progress", "completed"],
+      enum: {
+        values: ["pending", "in-progress", "completed"],
+        message: "{VALUE} is not a valid status.",
+      },
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -27,7 +30,10 @@ const TaskSchema = new Schema(
     priority: {
       type: String,
       required: false,
-      enum: ["low", "medium", "high"],
+      enum: {
+        values: ["low", "medium", "high"],
+        message: "{VALUE} is not a valid priority type.",
+      },
     },
     assignedTo: {
       type: String,
