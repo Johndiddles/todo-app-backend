@@ -30,6 +30,10 @@ const TaskSchema = new Schema(
       enum: ["low", "medium", "high"],
     },
     assignedTo: {
+      type: String,
+      required: false,
+    },
+    sharedWith: {
       type: [String],
       required: false,
     },
