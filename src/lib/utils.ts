@@ -2,6 +2,7 @@ import { Error } from "mongoose";
 import { ITask } from "../types/task";
 
 export const cleanTask: (task: any) => ITask = (task) => ({
+  id: task._id,
   title: task.title,
   description: task.description,
   dueDate: task.dueDate,

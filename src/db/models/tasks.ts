@@ -12,8 +12,29 @@ export const getTask = async (query: RootFilterQuery<any>) => {
   try {
     const task = await Task.findOne(query);
     if (task) {
-      return cleanTask(task);
-    } else throw new Error("Can't find task");
+      return { task: cleanTask(task) };
+    } else {
+      return {
+        error: "Can't find any match",
+        errorType: "notFound",
+      };
+    }
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const getTaskById = async (id: string) => {
+  try {
+    const task = await Task.findById(id);
+    if (task) {
+      return { task: cleanTask(task) };
+    } else {
+      return {
+        error: "Can't find task with matching id",
+        errorType: "notFound",
+      };
+    }
   } catch (error: any) {
     throw new Error(error);
   }

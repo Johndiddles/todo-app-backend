@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createTask, listTasks } from "../db/models/tasks";
-import { Error } from "mongoose";
+import { createTask, getTaskById, listTasks } from "../db/models/tasks";
+import mongoose from "mongoose";
 
 export const listTasksController = async (req: Request, res: Response) => {
   const tasks = await listTasks();
@@ -8,6 +8,23 @@ export const listTasksController = async (req: Request, res: Response) => {
     message: "success",
     tasks: tasks,
   });
+};
+
+export const getTaskByIdController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (mongoose.isValidObjectId(id)) {
+    const task = await getTaskById(id as string);
+    if (task.task) {
+      res.status(200).json({
+        message: "success",
+        task,
+      });
+    } else if (task.error) {
+      res.status(404).json({ message: task.error });
+    }
+  } else {
+    res.status(400).json({ message: "not a valid id" });
+  }
 };
 
 export const createTaskController = async (req: Request, res: Response) => {
