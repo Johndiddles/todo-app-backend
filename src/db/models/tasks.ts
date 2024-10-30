@@ -73,3 +73,20 @@ export const updateTask = async (id: string | ObjectId, task: ITask) => {
     return { error };
   }
 };
+
+export const deleteTask = async (id: string | ObjectId) => {
+  try {
+    const deletedTasks = await Task.findByIdAndDelete(id);
+    if (deletedTasks) {
+      return { id };
+    } else {
+      return {
+        error: "Can't find task with this id",
+        errorType: "notFound",
+      };
+    }
+  } catch (error) {
+    console.log({ error });
+    return { error };
+  }
+};
