@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
-import { createTask, getTaskById, listTasks } from "../db/models/tasks";
-import mongoose from "mongoose";
+import {
+  createTask,
+  getTaskById,
+  listTasks,
+  updateTask,
+} from "../db/models/tasks";
+import mongoose, { ObjectId } from "mongoose";
 
 export const listTasksController = async (req: Request, res: Response) => {
   const tasks = await listTasks();
@@ -57,6 +62,40 @@ export const createTaskController = async (req: Request, res: Response) => {
     res.status(500).json({
       status: "failed",
       message: "An unknown error occurred",
+    });
+  }
+};
+
+export const updateTaskController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (mongoose.isValidObjectId(id)) {
+      const payload = req.body;
+
+      const updatedTask = await updateTask(id, payload);
+      if (updatedTask.task) {
+        res.status(201).json({
+          status: "success",
+          message: "Updated task successfully",
+          task: updatedTask.task,
+        });
+      } else if (updatedTask.error) {
+        if (updatedTask.errorType === "ValidationError") {
+          res.status(400).json({
+            status: "failed",
+            error: updatedTask.error,
+          });
+        }
+      }
+    } else {
+      res.status(400).json({ message: "not a valid id" });
+    }
+  } catch (error) {
+    console.error({ error });
+    res.status(500).json({
+      status: "failed",
+      message: "An unknown error occurred",
+      error,
     });
   }
 };

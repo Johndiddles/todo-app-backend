@@ -1,4 +1,4 @@
-import { Error, RootFilterQuery } from "mongoose";
+import { Error, ObjectId, RootFilterQuery } from "mongoose";
 import { Task } from "../schema/task";
 import { ITask } from "../../types/task";
 import { cleanTask, handleTasksDBError } from "../../lib/utils";
@@ -46,6 +46,24 @@ export const createTask = async (task: ITask) => {
     const savedTask = await newTask.save();
     return { task: cleanTask(savedTask) };
   } catch (error: any) {
+    if (error instanceof Error.ValidationError) {
+      return {
+        error: handleTasksDBError(error),
+        errorType: "ValidationError",
+      };
+    }
+    return { error };
+  }
+};
+
+export const updateTask = async (id: string | ObjectId, task: ITask) => {
+  try {
+    const updatedTask = await Task.findByIdAndUpdate(id, task, {
+      new: true,
+      runValidators: true,
+    });
+    return { task: cleanTask(updatedTask) };
+  } catch (error) {
     if (error instanceof Error.ValidationError) {
       return {
         error: handleTasksDBError(error),
