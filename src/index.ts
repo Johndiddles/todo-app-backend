@@ -4,7 +4,7 @@ import { dbConnect } from "./db/dbConnect";
 import v1Routes from "./routes";
 
 dotenv.config();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5775;
 
 dbConnect();
 const app = express();
