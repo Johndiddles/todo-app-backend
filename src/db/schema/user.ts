@@ -1,11 +1,13 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema, Document, FilterQuery } from "mongoose";
 
-const UserSchema = new Schema(
+interface UserDocument extends Document {
+  email: string;
+  username: string;
+  password: string;
+}
+
+const UserSchema: Schema<UserDocument> = new Schema(
   {
-    id: {
-      type: String,
-      required: [true, "Title is required"],
-    },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -17,6 +19,7 @@ const UserSchema = new Schema(
       type: String,
       required: false,
       unique: true,
+      sparse: true,
       minlength: [2, "Username must be at least 2 characters long"],
     },
     password: {
