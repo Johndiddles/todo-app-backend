@@ -19,8 +19,6 @@ This solution to the challenge was built using
 
 To setup the project, please take the following steps.
 
-NOTE: The .env was deliberately exempted from .gitignore to relieve testers the stress of creating new MongoDB URI and specifying it in the .env file.
-
 - Clone the repo.
 
 ```git
@@ -39,6 +37,14 @@ cd todo-app-backend
 npm install
 ```
 
+Before running the server, populate your process.env with the following variables
+
+```env
+PORT=<YOUR PORT ID>
+MONGO_URI=<YOUR MONGO_DB URI>
+JWT_SECRET_KEY=<YOUR JWT SECRET KEY>
+```
+
 - run the server
 
 ```npm
@@ -53,8 +59,15 @@ The endpoints can be tested using postman or any other api testing tool.
 
 All endpoints available presently are listed below.
 
-- POST /v1/tasks: Creates a new task.
-- GET /v1/tasks: Retrieves all tasks.
-- GET /v1/tasks/:id: Retrieves a task by its ID.
-- PUT /v1/tasks/:id: Updates an existing task by ID.
-- DELETE /v1/tasks/:id: Deletes a task by ID.
+`TASKS:`
+
+- POST /v1/tasks : Creates a new task.
+- GET /v1/tasks : Retrieves all tasks.
+- GET /v1/tasks/:id : Retrieves a task by its ID.
+- PUT /v1/tasks/:id : Updates an existing task by ID.
+- DELETE /v1/tasks/:id : Deletes a task by ID.
+
+`USER:`
+
+- POST /v1/users/register : Creates a new task.
+- GET /v1/users/login : Retrieves all tasks.
