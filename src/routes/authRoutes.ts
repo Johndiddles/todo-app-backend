@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { registerUserController } from "../controllers/usersController";
 const authRouter = Router();
 
 authRouter.post("/login", (req: Request, res: Response) => {
@@ -12,5 +13,7 @@ authRouter.post("/login", (req: Request, res: Response) => {
     },
   });
 });
+
+authRouter.post("/register", registerUserController);
 
 export default authRouter;
