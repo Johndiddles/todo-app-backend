@@ -91,12 +91,21 @@ All endpoints available presently are listed below.
 }
 ```
 
-`USER:`
+`REGISTER USER:`
 
 ```json
 {
   "email": "johnee@email.com",
   "username": "johnee",
+  "password": "Password1"
+}
+```
+
+`LOGIN USER:`
+
+```json
+{
+  "email": "johnee@email.com",
   "password": "Password1"
 }
 ```
