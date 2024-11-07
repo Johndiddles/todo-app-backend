@@ -10,11 +10,14 @@ const UserSchema = new Schema(
       type: String,
       required: [true, "Email is required"],
       unique: true,
+      trim: true,
+      lowercase: true,
     },
     username: {
       type: String,
       required: false,
       unique: true,
+      minlength: [2, "Username must be at least 2 characters long"],
     },
     password: {
       type: String,
