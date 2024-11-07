@@ -71,3 +71,32 @@ All endpoints available presently are listed below.
 
 - POST /v1/users/register : Creates a new task.
 - GET /v1/users/login : Retrieves all tasks.
+
+### SAMPLE PAYLOADS
+
+`TASK:`
+
+```json
+{
+  "title": "title one - Updated",
+  "description": "description one",
+  "dueDate": "2024-11-07T13:44:36.767Z",
+  "status": "pending",
+  "createdBy": "672c925bb365442d0acaffdd",
+  "tags": ["random", "test"],
+  "sharedWith": ["john@email.com", "info@hng.com"],
+  "assignedTo": "john@doe.com",
+  "createdAt": "2024-11-07T12:18:41.963Z",
+  "updatedAt": "2024-11-07T12:18:41.963Z"
+}
+```
+
+`USER:`
+
+```json
+{
+  "email": "johnee@email.com",
+  "username": "johnee",
+  "password": "Password1"
+}
+```
