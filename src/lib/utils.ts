@@ -1,6 +1,7 @@
 import { Error } from "mongoose";
 import { ITask } from "../types/task";
 import { IUser } from "../types/user";
+import validator from "validator";
 
 export const cleanTask: (task: any) => ITask = (task) => ({
   id: task._id,
@@ -42,3 +43,5 @@ export const handleDBValidationError = (error: Error.ValidationError) =>
     field: item,
     message: error.errors[item].message,
   }));
+
+export const validateEmail = (email: string) => validator.isEmail(email);

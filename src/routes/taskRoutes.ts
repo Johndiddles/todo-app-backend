@@ -6,7 +6,10 @@ import {
   listTasksController,
   updateTaskController,
 } from "../controllers/tasksController";
+import { authMiddleware } from "../middlewares/authMiddleware";
 const taskRouter = Router();
+
+taskRouter.use(authMiddleware);
 
 taskRouter.get("/", listTasksController);
 taskRouter.get("/:id", getTaskByIdController);

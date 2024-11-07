@@ -1,14 +1,19 @@
-import { Error, ObjectId, RootFilterQuery } from "mongoose";
+import { Error, ObjectId, RootFilterQuery, Types } from "mongoose";
 import { Task } from "../schema/task";
 import { ITask } from "../../types/task";
 import { cleanTask, handleDBValidationError } from "../../lib/utils";
 
-export const listTasks = async () => {
-  const tasks = await Task.find();
+export const listTasks = async (userId: string) => {
+  const filter = {
+    $or: [{ createdBy: userId }, { sharedWith: { $in: [userId] } }],
+  };
+  const tasks = await Task.find(filter);
   return tasks.map((task) => cleanTask(task)) || [];
 };
 
 export const getTask = async (query: RootFilterQuery<any>) => {
+  console.log({ query });
+
   try {
     const task = await Task.findOne(query);
     if (task) {

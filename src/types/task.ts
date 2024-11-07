@@ -7,6 +7,7 @@ export interface ITask {
   createdBy?: string;
   assignedTo?: string;
   tags?: string[];
+  sharedWith?: string[];
   createdAt?: Date;
   updatedAt?: Date;
 }

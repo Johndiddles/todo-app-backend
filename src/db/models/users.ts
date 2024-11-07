@@ -26,7 +26,7 @@ export const getUser = async (
   try {
     const user = await User.findOne(
       query,
-      returnFields || ["email", "username"]
+      returnFields || ["id", "email", "username"]
     ).exec();
     console.log({ user });
     if (user) {

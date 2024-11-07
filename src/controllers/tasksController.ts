@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import {
   createTask,
   deleteTask,
@@ -6,10 +6,15 @@ import {
   listTasks,
   updateTask,
 } from "../db/models/tasks";
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
+
+import { Request } from "../types/express";
 
 export const listTasksController = async (req: Request, res: Response) => {
-  const tasks = await listTasks();
+  const { id } = req.user!;
+
+  const tasks = await listTasks(id);
+
   res.status(200).json({
     message: "success",
     tasks: tasks,
@@ -17,16 +22,26 @@ export const listTasksController = async (req: Request, res: Response) => {
 };
 
 export const getTaskByIdController = async (req: Request, res: Response) => {
+  const { id: userId, email } = req.user!;
   const { id } = req.params;
   if (mongoose.isValidObjectId(id)) {
     const task = await getTaskById(id as string);
-    if (task.task) {
+
+    if (!task.task) {
+      res.status(404).json({ message: task.error });
+    }
+
+    if (
+      task.task?.createdBy?.toString() === userId ||
+      task.task?.assignedTo === email ||
+      task.task?.sharedWith?.includes(email)
+    ) {
       res.status(200).json({
         message: "success",
         task,
       });
-    } else if (task.error) {
-      res.status(404).json({ message: task.error });
+    } else {
+      res.status(403).json({ status: "error", message: "Forbidden" });
     }
   } else {
     res.status(400).json({ message: "not a valid id" });
@@ -35,14 +50,15 @@ export const getTaskByIdController = async (req: Request, res: Response) => {
 
 export const createTaskController = async (req: Request, res: Response) => {
   try {
-    const { title, description, dueDate, status, createdBy } = req.body;
+    const { title, description, dueDate, status } = req.body;
+    const user = req.user;
 
     const newTask = await createTask({
       title,
       description,
       dueDate,
       status,
-      createdBy,
+      createdBy: user!.id,
     });
     if (newTask.task) {
       res.status(201).json({
@@ -70,23 +86,41 @@ export const createTaskController = async (req: Request, res: Response) => {
 export const updateTaskController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    if (mongoose.isValidObjectId(id)) {
-      const payload = req.body;
+    const { id: userId, email } = req.user!;
 
-      const updatedTask = await updateTask(id, payload);
-      if (updatedTask.task) {
-        res.status(201).json({
-          status: "success",
-          message: "Updated task successfully",
-          task: updatedTask.task,
-        });
-      } else if (updatedTask.error) {
-        if (updatedTask.errorType === "ValidationError") {
-          res.status(400).json({
-            status: "failed",
-            error: updatedTask.error,
+    if (mongoose.isValidObjectId(id)) {
+      const task = await getTaskById(id as string);
+
+      if (!task.task) {
+        res.status(404).json({ message: task.error });
+      }
+
+      if (
+        task.task?.createdBy?.toString() === userId ||
+        task?.task?.assignedTo === email
+      ) {
+        const payload = req.body;
+
+        const updatedTask = await updateTask(id, payload);
+        if (updatedTask.task) {
+          res.status(201).json({
+            status: "success",
+            message: "Updated task successfully",
+            task: updatedTask.task,
           });
+        } else if (updatedTask.error) {
+          if (updatedTask.errorType === "ValidationError") {
+            res.status(400).json({
+              status: "failed",
+              error: updatedTask.error,
+            });
+          }
         }
+      } else {
+        res.status(403).json({
+          status: "error",
+          message: "User is not authorized to update this task.",
+        });
       }
     } else {
       res.status(400).json({ message: "not a valid id" });
@@ -104,24 +138,41 @@ export const updateTaskController = async (req: Request, res: Response) => {
 export const deleteTaskController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { id: userId } = req.user!;
     if (mongoose.isValidObjectId(id)) {
-      const deletedTask = await deleteTask(id);
-      if (deletedTask.id) {
-        res.status(201).json({
-          status: "success",
-          message: "Deleted task successfully",
-          task: deletedTask.id,
-        });
-      } else if (deletedTask.error) {
-        if (deletedTask.errorType === "notFound") {
-          res
-            .status(404)
-            .json({ status: "failed", message: deletedTask.error });
-        } else
-          res.status(400).json({
-            status: "failed",
-            error: deletedTask.error,
+      const task = await getTaskById(id as string);
+
+      if (!task.task) {
+        res.status(404).json({ message: task.error });
+      }
+
+      if (
+        task.task?.createdBy === userId ||
+        task?.task?.assignedTo === userId
+      ) {
+        const deletedTask = await deleteTask(id);
+        if (deletedTask.id) {
+          res.status(201).json({
+            status: "success",
+            message: "Deleted task successfully",
+            task: deletedTask.id,
           });
+        } else if (deletedTask.error) {
+          if (deletedTask.errorType === "notFound") {
+            res
+              .status(404)
+              .json({ status: "failed", message: deletedTask.error });
+          } else
+            res.status(400).json({
+              status: "failed",
+              error: deletedTask.error,
+            });
+        }
+      } else {
+        res.status(403).json({
+          status: "error",
+          message: "User is not authorized to update this task.",
+        });
       }
     } else {
       res.status(400).json({ message: "not a valid id" });

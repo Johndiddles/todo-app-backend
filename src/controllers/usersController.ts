@@ -29,7 +29,7 @@ export const registerUserController = async (req: Request, res: Response) => {
     });
 
     if (newUser.user) {
-      const token = signToken(newUser.user.email);
+      const token = signToken(newUser.user.email, newUser.user.id!);
 
       res.status(201).json({
         status: "success",
@@ -71,6 +71,7 @@ export const userLoginController = async (req: Request, res: Response) => {
     }
 
     const { user, error } = await getUser({ email }, [
+      "_id",
       "email",
       "username",
       "password",
@@ -94,15 +95,13 @@ export const userLoginController = async (req: Request, res: Response) => {
       return;
     }
 
-    const token = signToken(user!.email);
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Logged in successfully",
-        user: cleanUser(user),
-        token,
-      });
+    const token = signToken(user!.email, user!.id!);
+    res.status(200).json({
+      status: "success",
+      message: "Logged in successfully",
+      user: cleanUser(user),
+      token,
+    });
   } catch (error) {
     console.log({ error });
     res.status(500).json({

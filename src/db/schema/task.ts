@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { validateEmail } from "../../lib/utils";
 
 const TaskSchema = new Schema(
   {
@@ -38,10 +39,29 @@ const TaskSchema = new Schema(
     assignedTo: {
       type: String,
       required: false,
+      validate: {
+        validator: (email: string) => (!email ? true : validateEmail(email)),
+        message: (props: { value: string[] }) =>
+          `${props.value} is not a valid email address!`,
+      },
+      default: undefined,
     },
     sharedWith: {
       type: [String],
       required: false,
+      validate: {
+        validator: (emails: string[]) =>
+          !emails ? true : emails.every((email) => validateEmail(email)),
+        message: (props: { value: string[] }) => {
+          const invalidEmails = props.value.filter(
+            (email) => !validateEmail(email)
+          );
+
+          return invalidEmails?.length > 1
+            ? `[${invalidEmails.join(", ")}] are not valid email addresses`
+            : `${invalidEmails[0]} is not a valid email address`;
+        },
+      },
     },
     tags: {
       type: [String],
