@@ -44,3 +44,30 @@ export const validateNewUserPayload: (payload: {
     status: "success",
   };
 };
+
+export const validateUserLoginPayload: (payload: {
+  email: string;
+  password: string;
+}) => Promise<{
+  status: "error" | "success";
+  message?: string;
+}> = async (payload) => {
+  const { email, password } = payload;
+
+  if (!email) {
+    return {
+      status: "error",
+      message: "Email is required",
+    };
+  }
+  if (!password) {
+    return {
+      status: "error",
+      message: "Password is required",
+    };
+  }
+
+  return {
+    status: "success",
+  };
+};

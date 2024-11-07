@@ -17,11 +17,25 @@ export const cleanTask: (task: any) => ITask = (task) => ({
   updatedAt: task.updatedAt,
 });
 
-export const cleanUser: (user: any) => IUser = (user) => ({
-  id: user._id,
-  email: user.email,
-  username: user.username || "",
-});
+export const cleanUser: (
+  user: any,
+  options?: { includePassword?: boolean }
+) => IUser = (user, options) => {
+  const cleanedUser: IUser = {
+    id: user._id,
+    email: user.email,
+  };
+
+  if (user.username) {
+    cleanedUser.username = user.username;
+  }
+
+  if (user.password && options?.includePassword) {
+    cleanedUser.password = user.password;
+  }
+
+  return cleanedUser;
+};
 
 export const handleDBValidationError = (error: Error.ValidationError) =>
   Object.keys(error.errors).map((item) => ({

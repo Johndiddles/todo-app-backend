@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { createUser, getUser } from "../db/models/users";
 import { signToken } from "../lib/jwt";
-import { hashPassword } from "../lib/passwordHashing";
-import { validateNewUserPayload } from "../lib/userValidation";
+import { comparePassword, hashPassword } from "../lib/passwordHashing";
+import {
+  validateNewUserPayload,
+  validateUserLoginPayload,
+} from "../lib/userValidation";
+import { cleanUser } from "../lib/utils";
 
 export const registerUserController = async (req: Request, res: Response) => {
   try {
@@ -24,12 +28,8 @@ export const registerUserController = async (req: Request, res: Response) => {
       password: hashedPassword,
     });
 
-    console.log({ newUser });
-
     if (newUser.user) {
       const token = signToken(newUser.user.email);
-
-      console.log({ token });
 
       res.status(201).json({
         status: "success",
@@ -51,10 +51,63 @@ export const registerUserController = async (req: Request, res: Response) => {
       }
     }
   } catch (error) {
-    console.error({ error });
     res.status(500).json({
       status: "failed",
       message: "An unknown error occurred",
+    });
+  }
+};
+
+export const userLoginController = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const validationStatus = await validateUserLoginPayload({
+      email,
+      password,
+    });
+    if (validationStatus.status === "error") {
+      res.status(400).json(validationStatus);
+      return;
+    }
+
+    const { user, error } = await getUser({ email }, [
+      "email",
+      "username",
+      "password",
+    ]);
+
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "Invalid login details",
+      });
+      return;
+    }
+
+    const isPasswordMatched = await comparePassword(password, user?.password!);
+
+    if (!isPasswordMatched) {
+      res.status(400).json({
+        status: "error",
+        message: "Invalid login details",
+      });
+      return;
+    }
+
+    const token = signToken(user!.email);
+    res
+      .status(200)
+      .json({
+        status: "success",
+        message: "Logged in successfully",
+        user: cleanUser(user),
+        token,
+      });
+  } catch (error) {
+    console.log({ error });
+    res.status(500).json({
+      status: "error",
+      message: "An unknown error occurred.",
     });
   }
 };

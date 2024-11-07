@@ -24,9 +24,13 @@ export const getUser = async (
   returnFields?: string[]
 ) => {
   try {
-    const user = await User.findOne(query, returnFields).exec();
+    const user = await User.findOne(
+      query,
+      returnFields || ["email", "username"]
+    ).exec();
+    console.log({ user });
     if (user) {
-      return { user: cleanUser(user) };
+      return { user: cleanUser(user, { includePassword: true }) };
     } else {
       return {
         error: "Can't find any match",
