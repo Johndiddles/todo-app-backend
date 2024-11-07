@@ -1,7 +1,7 @@
 import { Error, ObjectId, RootFilterQuery } from "mongoose";
 import { Task } from "../schema/task";
 import { ITask } from "../../types/task";
-import { cleanTask, handleTasksDBError } from "../../lib/utils";
+import { cleanTask, handleDBValidationError } from "../../lib/utils";
 
 export const listTasks = async () => {
   const tasks = await Task.find();
@@ -48,7 +48,7 @@ export const createTask = async (task: ITask) => {
   } catch (error: any) {
     if (error instanceof Error.ValidationError) {
       return {
-        error: handleTasksDBError(error),
+        error: handleDBValidationError(error),
         errorType: "ValidationError",
       };
     }
@@ -66,7 +66,7 @@ export const updateTask = async (id: string | ObjectId, task: ITask) => {
   } catch (error) {
     if (error instanceof Error.ValidationError) {
       return {
-        error: handleTasksDBError(error),
+        error: handleDBValidationError(error),
         errorType: "ValidationError",
       };
     }

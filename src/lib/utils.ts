@@ -1,5 +1,6 @@
 import { Error } from "mongoose";
 import { ITask } from "../types/task";
+import { IUser } from "../types/user";
 
 export const cleanTask: (task: any) => ITask = (task) => ({
   id: task._id,
@@ -16,7 +17,13 @@ export const cleanTask: (task: any) => ITask = (task) => ({
   updatedAt: task.updatedAt,
 });
 
-export const handleTasksDBError = (error: Error.ValidationError) =>
+export const cleanUser: (user: any) => IUser = (user) => ({
+  id: user._id,
+  email: user.email,
+  username: user.username || "",
+});
+
+export const handleDBValidationError = (error: Error.ValidationError) =>
   Object.keys(error.errors).map((item) => ({
     field: item,
     message: error.errors[item].message,
