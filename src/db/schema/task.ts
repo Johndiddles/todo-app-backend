@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { validateEmail } from "../../lib/utils";
+import { title } from "process";
 
 const TaskSchema = new Schema(
   {
@@ -26,11 +27,11 @@ const TaskSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: false,
+      required: true,
     },
     priority: {
       type: String,
-      required: false,
+      required: true,
       enum: {
         values: ["low", "medium", "high"],
         message: "{VALUE} is not a valid priority type.",
@@ -73,4 +74,5 @@ const TaskSchema = new Schema(
   }
 );
 
+TaskSchema.index({ dueDate: 1, status: 1 });
 export const Task = model("Task", TaskSchema);

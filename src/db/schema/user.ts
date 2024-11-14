@@ -32,4 +32,5 @@ const UserSchema: Schema<UserDocument> = new Schema(
   }
 );
 
+UserSchema.index({ email: 1 }, { unique: true });
 export const User = model("User", UserSchema);

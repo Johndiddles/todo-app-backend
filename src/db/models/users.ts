@@ -28,7 +28,6 @@ export const getUser = async (
       query,
       returnFields || ["id", "email", "username"]
     ).exec();
-    console.log({ user });
     if (user) {
       return { user: cleanUser(user, { includePassword: true }) };
     } else {
