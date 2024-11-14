@@ -1,12 +1,10 @@
 import { Router } from "express";
-import {
-  createTaskController,
-  deleteTaskController,
-  getTaskByIdController,
-  listTasksController,
-  updateTaskController,
-} from "../controllers/tasksController";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import { listTasksController } from "../controllers/tasks/listTasks.controller";
+import { getTaskByIdController } from "../controllers/tasks/getTaskById.controller";
+import { createTaskController } from "../controllers/tasks/createTask.controller";
+import { updateTaskController } from "../controllers/tasks/updateTask.controller";
+import { deleteTaskController } from "../controllers/tasks/deleteTask.controller";
 const taskRouter = Router();
 
 taskRouter.use(authMiddleware);
