@@ -5,10 +5,10 @@ import { listTasks } from "../../db/models/tasks";
 export const listTasksController = async (req: Request, res: Response) => {
   const { id } = req.user!;
 
-  const tasks = await listTasks(id);
+  const tasks = await listTasks(id, req.query);
 
   res.status(200).json({
     message: "success",
-    tasks: tasks,
+    ...tasks,
   });
 };

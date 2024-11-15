@@ -3,17 +3,56 @@ import { Task } from "../schema/task";
 import { ITask } from "../../types/task";
 import { cleanTask, handleDBValidationError } from "../../lib/utils";
 
-export const listTasks = async (userId: string) => {
+interface PaginationQuery {
+  page?: string;
+  limit?: string;
+}
+
+interface PaginatedResponse {
+  tasks: ITask[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+const parseQueryParams = (query: PaginationQuery) => {
+  const page = Math.max(1, parseInt(query.page || "1", 10));
+  const limit = Math.min(100, Math.max(1, parseInt(query.limit || "10", 10)));
+
+  return { page, limit };
+};
+
+export const listTasks = async (
+  userId: string,
+  query: PaginationQuery
+): Promise<PaginatedResponse> => {
+  const { page, limit } = parseQueryParams(query);
+  const skip = (page - 1) * limit;
   const filter = {
     $or: [{ createdBy: userId }, { sharedWith: { $in: [userId] } }],
   };
-  const tasks = await Task.find(filter);
-  return tasks.map((task) => cleanTask(task)) || [];
+  const [tasks, totalCount] = await Promise.all([
+    Task.find(filter).skip(skip).limit(limit).lean().exec(),
+    Task.countDocuments({}),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    tasks: tasks.map((task) => cleanTask(task)) || [],
+    currentPage: page,
+    totalPages,
+    totalItems: totalCount,
+    itemsPerPage: limit,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
 };
 
 export const getTask = async (query: RootFilterQuery<any>) => {
-  console.log({ query });
-
   try {
     const task = await Task.findOne(query);
     if (task) {
