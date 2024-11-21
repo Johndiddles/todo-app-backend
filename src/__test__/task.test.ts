@@ -52,7 +52,7 @@ describe("task", () => {
     await db.closeDatabase();
   });
 
-  describe("get tasks", () => {
+  describe("get tasks:", () => {
     describe("given user is not logged in", () => {
       it("should return 401", async () => {
         const { statusCode } = await supertest(app).get("/v1/tasks");
@@ -80,7 +80,7 @@ describe("task", () => {
     });
   });
 
-  describe("get single task", () => {
+  describe("get single task:", () => {
     describe("given user is not logged in", () => {
       it("should return 401", async () => {
         const { statusCode } = await supertest(app).get(
@@ -124,7 +124,7 @@ describe("task", () => {
     });
   });
 
-  describe("create task", () => {
+  describe("create task:", () => {
     describe("given that user is logged in and task payload is correct", () => {
       it("should return 201", async () => {
         const jwt = signToken(userDetails.email, id!);
@@ -181,7 +181,7 @@ describe("task", () => {
     });
   });
 
-  describe("update task", () => {
+  describe("update task:", () => {
     describe("given that user is logged in and task payload is correct", () => {
       it("should return 201", async () => {
         const jwt = signToken(userDetails.email, id!);
@@ -215,7 +215,54 @@ describe("task", () => {
     });
   });
 
-  describe("delete task", () => {
+  describe("share task:", () => {
+    describe("given that user is logged in and task payload is correct", () => {
+      it("should return 201", async () => {
+        const jwt = signToken(userDetails.email, id!);
+        const payload = {
+          id: task_id!,
+          email: "johndiddles@tasks.com",
+        };
+        const { body, statusCode } = await supertest(app)
+          .post(`/v1/tasks/share`)
+          .set("Authorization", `Bearer ${jwt}`)
+          .send(payload);
+
+        expect(statusCode).toBe(201);
+      });
+    });
+
+    describe("given that user is logged in but task payload is incorrect", () => {
+      it("should return 400", async () => {
+        const jwt = signToken(userDetails.email, id!);
+        const payload = {
+          id: task_id!,
+        };
+        const { body, statusCode } = await supertest(app)
+          .post(`/v1/tasks/share`)
+          .set("Authorization", `Bearer ${jwt}`)
+          .send(payload);
+
+        expect(statusCode).toBe(400);
+      });
+    });
+
+    describe("given that user is not logged in", () => {
+      it("should return 401", async () => {
+        const payload = {
+          title: "Test",
+          description: "Test description",
+        };
+        const { statusCode } = await supertest(app)
+          .post(`/v1/tasks/share`)
+          .send(payload);
+
+        expect(statusCode).toBe(401);
+      });
+    });
+  });
+
+  describe("delete task:", () => {
     describe("given that user is logged in", () => {
       it("should return 200", async () => {
         const jwt = signToken(userDetails.email, id!);

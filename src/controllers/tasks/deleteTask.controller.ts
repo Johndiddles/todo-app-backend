@@ -15,7 +15,6 @@ export const deleteTaskController = async (req: Request, res: Response) => {
         return;
       }
 
-      console.log({ userId, createdBy: task.task?.createdBy });
       if (
         task.task?.createdBy?.toString() === userId ||
         task?.task?.assignedTo === userId

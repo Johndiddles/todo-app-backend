@@ -118,6 +118,33 @@ export const updateTask = async (id: string | ObjectId, task: ITask) => {
   }
 };
 
+export const shareTask = async (id: string | ObjectId, email: string) => {
+  try {
+    const existingTask = await getTaskById(id as string);
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      {
+        ...existingTask.task,
+        sharedWith: [...existingTask?.task?.sharedWith!, email],
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    return { task: cleanTask(updatedTask) };
+  } catch (error) {
+    if (error instanceof Error.ValidationError) {
+      return {
+        error: handleDBValidationError(error),
+        errorType: "ValidationError",
+      };
+    }
+    return { error };
+  }
+};
+
 export const deleteTask = async (id: string | ObjectId) => {
   try {
     const deletedTasks = await Task.findByIdAndDelete(id);
