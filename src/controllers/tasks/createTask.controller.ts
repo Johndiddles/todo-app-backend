@@ -4,7 +4,7 @@ import { createTask } from "../../db/models/tasks";
 
 export const createTaskController = async (req: Request, res: Response) => {
   try {
-    const { title, description, dueDate, status, priority } = req.body;
+    const { title, description, dueDate, status, priority, tags } = req.body;
     const user = req.user;
 
     const newTask = await createTask({
@@ -14,6 +14,7 @@ export const createTaskController = async (req: Request, res: Response) => {
       status,
       priority,
       createdBy: user!.id,
+      tags,
     });
     if (newTask.task) {
       res.status(201).json({
