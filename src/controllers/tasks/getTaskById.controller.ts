@@ -11,6 +11,7 @@ export const getTaskByIdController = async (req: Request, res: Response) => {
 
     if (!task.task) {
       res.status(404).json({ message: task.error });
+      return;
     }
 
     if (
@@ -22,10 +23,13 @@ export const getTaskByIdController = async (req: Request, res: Response) => {
         message: "success",
         task,
       });
+      return;
     } else {
       res.status(403).json({ status: "error", message: "Forbidden" });
+      return;
     }
   } else {
     res.status(400).json({ message: "not a valid id" });
+    return;
   }
 };

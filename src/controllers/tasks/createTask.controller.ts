@@ -4,7 +4,7 @@ import { createTask } from "../../db/models/tasks";
 
 export const createTaskController = async (req: Request, res: Response) => {
   try {
-    const { title, description, dueDate, status } = req.body;
+    const { title, description, dueDate, status, priority } = req.body;
     const user = req.user;
 
     const newTask = await createTask({
@@ -12,6 +12,7 @@ export const createTaskController = async (req: Request, res: Response) => {
       description,
       dueDate,
       status,
+      priority,
       createdBy: user!.id,
     });
     if (newTask.task) {

@@ -12,38 +12,45 @@ export const deleteTaskController = async (req: Request, res: Response) => {
 
       if (!task.task) {
         res.status(404).json({ message: task.error });
+        return;
       }
 
+      console.log({ userId, createdBy: task.task?.createdBy });
       if (
-        task.task?.createdBy === userId ||
+        task.task?.createdBy?.toString() === userId ||
         task?.task?.assignedTo === userId
       ) {
         const deletedTask = await deleteTask(id);
         if (deletedTask.id) {
-          res.status(201).json({
+          res.status(200).json({
             status: "success",
             message: "Deleted task successfully",
             task: deletedTask.id,
           });
+          return;
         } else if (deletedTask.error) {
           if (deletedTask.errorType === "notFound") {
             res
               .status(404)
               .json({ status: "failed", message: deletedTask.error });
+            return;
           } else
             res.status(400).json({
               status: "failed",
               error: deletedTask.error,
             });
+          return;
         }
       } else {
         res.status(403).json({
           status: "error",
           message: "User is not authorized to update this task.",
         });
+        return;
       }
     } else {
       res.status(400).json({ message: "not a valid id" });
+      return;
     }
   } catch (error) {
     console.error({ error });
@@ -52,5 +59,6 @@ export const deleteTaskController = async (req: Request, res: Response) => {
       message: "An unknown error occurred",
       error,
     });
+    return;
   }
 };
