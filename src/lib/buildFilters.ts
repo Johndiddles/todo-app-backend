@@ -7,7 +7,8 @@ export type buildTaskFilterType = {
   status?: string;
   priority?: string;
   assignedTo?: string;
-  tags?: string[];
+  tags?: string;
+  sharedWith?: string;
 };
 export const buildFilter = ({
   startDate,
@@ -16,6 +17,7 @@ export const buildFilter = ({
   priority,
   assignedTo,
   tags,
+  sharedWith,
 }: buildTaskFilterType) => {
   const filter: FilterQuery<ITask> = {};
 
@@ -25,6 +27,14 @@ export const buildFilter = ({
       : [tags as string];
 
     filter.tags = { $all: tagsArray };
+  }
+
+  if (sharedWith) {
+    const sharedWithArray = Array.isArray(sharedWith)
+      ? (sharedWith as string[])
+      : [sharedWith as string];
+
+    filter.sharedWith = { $all: sharedWithArray };
   }
 
   if (startDate || endDate) {
