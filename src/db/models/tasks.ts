@@ -2,11 +2,14 @@ import { Error, ObjectId, RootFilterQuery, Types } from "mongoose";
 import { Task } from "../schema/task";
 import { ITask } from "../../types/task";
 import { cleanTask, handleDBValidationError } from "../../lib/utils";
+import { buildFilter, buildTaskFilterType } from "../../lib/buildFilters";
 
 interface PaginationQuery {
   page?: string;
   limit?: string;
 }
+
+type TaskFilterQuery = PaginationQuery & buildTaskFilterType;
 
 interface PaginatedResponse {
   tasks: ITask[];
@@ -27,13 +30,17 @@ const parseQueryParams = (query: PaginationQuery) => {
 
 export const listTasks = async (
   userId: string,
-  query: PaginationQuery
+  query: PaginationQuery & buildTaskFilterType
 ): Promise<PaginatedResponse> => {
   const { page, limit } = parseQueryParams(query);
   const skip = (page - 1) * limit;
+
+  const filterFromQuery = buildFilter(query);
   const filter = {
+    ...filterFromQuery,
     $or: [{ createdBy: userId }, { sharedWith: { $in: [userId] } }],
   };
+
   const [tasks, totalCount] = await Promise.all([
     Task.find(filter).skip(skip).limit(limit).lean().exec(),
     Task.countDocuments({}),
