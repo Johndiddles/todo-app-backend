@@ -1,3 +1,4 @@
+import validator from "validator";
 import { getUser } from "../db/models/users";
 
 export const validateNewUserPayload: (payload: {
@@ -20,6 +21,19 @@ export const validateNewUserPayload: (payload: {
     return {
       status: "error",
       message: "Password is required",
+    };
+  }
+  if (
+    !validator.isStrongPassword(password, {
+      minLength: 8,
+      minNumbers: 1,
+      minLowercase: 1,
+      minUppercase: 1,
+    })
+  ) {
+    return {
+      status: "error",
+      message: "Password is too weak",
     };
   }
   const existingEmail = await getUser({ email: email });
